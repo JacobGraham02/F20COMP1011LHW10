@@ -8,10 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.OptionalDouble;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CustomerViewController implements Initializable {
 
@@ -87,7 +85,7 @@ public class CustomerViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        
+        allCustomers = DBUtility.getCustomers();
         //This set's up the checkbox objects to filter by province
         //and puts them all in an ArrayList<CheckBox> called
         //checkBoxes.  This way you can loop over the CheckBox objects
@@ -158,7 +156,7 @@ public class CustomerViewController implements Initializable {
         genderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
         provinceColumn.setCellValueFactory(new PropertyValueFactory<>("province"));
         bloodTypeColumn.setCellValueFactory(new PropertyValueFactory<>("bloodType"));
-        tableView.getItems().addAll(DBUtility.getCustomers());
+        tableView.getItems().addAll(allCustomers);
     }
 
     /**
@@ -168,7 +166,13 @@ public class CustomerViewController implements Initializable {
      */
     @FXML
     private void search(String searchString){
-        System.out.println("setNameSearchTextField() called");
+        List<Customer> filtered = allCustomers.stream()
+                                            .filter(customer -> customer.getFirstName()
+                                                            .contains(searchString))
+                                            .collect(Collectors.toList());
+        tableView.getItems().clear();
+        tableView.getItems().addAll(filtered);
+        updateLabels();
     }
 
     /**
