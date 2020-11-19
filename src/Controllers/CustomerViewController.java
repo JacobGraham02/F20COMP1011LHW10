@@ -10,6 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.OptionalDouble;
 import java.util.ResourceBundle;
 
 public class CustomerViewController implements Initializable {
@@ -104,11 +105,23 @@ public class CustomerViewController implements Initializable {
     }
 
 
-    private void updateLabels()
+    private void updateLabels() {
+        rowSelectedLabel.setText("Rows Returned: " + tableView.getItems().size());
+        malePercentLabel.setText(String.format("Male: %.1f%%", getGenderPercent("male")));
+        femalePercentLabel.setText(String.format("Female: %.1f%%", getGenderPercent("female")));
+        averageAgeLabel.setText(getAverageAge());
+    }
+
+    private String getAverageAge()
     {
-        rowSelectedLabel.setText("Rows Returned: "+tableView.getItems().size());
-        malePercentLabel.setText(String.format("Male: %.1f%%",getGenderPercent("male")));
-        femalePercentLabel.setText(String.format("Female: %.1f%%",getGenderPercent("female")));
+        OptionalDouble avgAge = tableView.getItems().stream()  //stream of Customer objects
+                            .mapToDouble(Customer::getAge)  //converts the stream to hold Double objects
+                            .average();
+
+        if (avgAge.isPresent())
+            return String.format("Avg Age: %.1f", avgAge.getAsDouble());
+        else
+            return "Average Age: Not Applicable";
     }
 
     private double getGenderPercent(String gender)
