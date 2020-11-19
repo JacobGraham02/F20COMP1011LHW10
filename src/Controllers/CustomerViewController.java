@@ -1,6 +1,7 @@
 package Controllers;
 
 import Models.Customer;
+import Utilities.DBUtility;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -16,9 +17,6 @@ public class CustomerViewController implements Initializable {
 
     @FXML
     private TableView<Customer> tableView;
-
-    @FXML
-    private TableColumn<Customer, Integer> idColumn;
 
     @FXML
     private TableColumn<Customer, String> firstNameColumn;
@@ -102,6 +100,24 @@ public class CustomerViewController implements Initializable {
         //code in there
         searchTextField.textProperty().addListener((obs, oldValue, searchString)->
                 search(searchString));
+        updateLabels();
+    }
+
+
+    private void updateLabels()
+    {
+        rowSelectedLabel.setText("Rows Returned: "+tableView.getItems().size());
+        malePercentLabel.setText(String.format("Male: %.1f%%",getGenderPercent("male")));
+        femalePercentLabel.setText(String.format("Female: %.1f%%",getGenderPercent("female")));
+    }
+
+    private double getGenderPercent(String gender)
+    {
+        long count = tableView.getItems()
+                    .stream()
+                    .filter(customer -> customer.getGender().equalsIgnoreCase(gender))
+                    .count();
+        return (double) count / tableView.getItems().size() * 100;
     }
 
 
@@ -123,13 +139,13 @@ public class CustomerViewController implements Initializable {
      */
     private void configureTableColumns()
     {
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         ageColumn.setCellValueFactory(new PropertyValueFactory<>("age"));
         genderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
         provinceColumn.setCellValueFactory(new PropertyValueFactory<>("province"));
         bloodTypeColumn.setCellValueFactory(new PropertyValueFactory<>("bloodType"));
+        tableView.getItems().addAll(DBUtility.getCustomers());
     }
 
     /**

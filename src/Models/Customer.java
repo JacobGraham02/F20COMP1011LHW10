@@ -1,6 +1,7 @@
 package Models;
 
 import java.time.LocalDate;
+import java.time.Period;
 
 public class Customer {
     private String gender, firstName, lastName;
@@ -61,10 +62,23 @@ public class Customer {
     }
 
     public void setBirthday(String birthday) {
+        //'12/23/1989'
+        String[] birthdayInfo = birthday.split("/");
+        int month = Integer.parseInt(birthdayInfo[0]);
+        int day = Integer.parseInt(birthdayInfo[1]);
+        int year = Integer.parseInt(birthdayInfo[2]);
+
+        this.birthday = LocalDate.of(year, month, day);
     }
 
     public int getAge()
     {
-        return 0;
+        return Period.between(birthday, LocalDate.now()).getYears();
+    }
+
+    public String toString()
+    {
+        return String.format("%s %s age:%2d   gender: %s ",firstName, lastName,
+                                    getAge(), gender);
     }
 }
